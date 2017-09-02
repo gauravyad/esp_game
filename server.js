@@ -32,33 +32,57 @@ io.on('connection', function(socket) {
     
       players[socket.id] = {
         partner:0,
-        partner_answer:answers
+        partner_answer:answers,
+        isPlaying:true
       };
       console.log("No Match");
     }
     else{
       players[socket.id] = {
         partner:last_wait,
-        partner_answer:last_ans
+        partner_answer:last_ans,
+        isPlaying:true
       };
       players[last_wait.id]={
         partner:socket,
         partner_answer:answers,
+        isPlaying:true
       };
-      last_wait.emit('startMatch');
-      socket.emit('startMatch')
+      var imgs={};
+      for(var i=0;i<5;i++){
+        var cur=Math.floor(Math.random()*15)+1;
+        for(var j=0;j<i;j++){
+          if(cur==imgs[j]){
+            i--;
+            cur=-1;
+            break;
+          }
+        }
+        if(cur!=-1){
+          imgs[i]=cur;
+        }
+      }
+
+      last_wait.emit('startMatch',imgs);
+      socket.emit('startMatch',imgs)
       last_wait=0;
       last_ans=0;
       console.log("Match Found");
-    }
-  });
-  socket.on('answers', function(data,cur) {
-      players[players[socket.id].partner.id].partner_answer=data;
-      
-      if(players[socket.id].partner_answer[cur]==data[cur]){
-        socket.emit('ansMatch');
-        players[socket.id].partner.emit('ansMatch');
       }
     
+  });
+  socket.on('answers', function(data,arr) {
+      players[players[socket.id].partner.id].partner_answer=data;
+      if(players[players[socket.id].partner.id].isPlaying==false){
+        var score=0;
+        for(var i=0;i<5;i++){
+          if(players[socket.id].partner_answer[arr[i]]==data[arr[i]]){
+            score++;
+          }
+        }
+        socket.emit('score',score);
+        players[socket.id].partner.emit('score',score);
+      }
+      players[socket.id].isPlaying=false;
   });
 });
