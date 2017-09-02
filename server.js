@@ -19,6 +19,46 @@ server.listen(5000, function() {
 // Add the WebSocket handlers
 io.on('connection', function(socket) {
 });
-setInterval(function() {
-  io.sockets.emit('message', 'hi!');
-}, 1000);
+var players = {};
+var player_num=0;
+var last_wait=0;
+var last_ans=0;
+io.on('connection', function(socket) {
+  socket.on('new player', function(answers) {
+    player_num++;
+    if(player_num%2==1){
+      last_wait=socket;
+      last_ans=answers;
+    
+      players[socket.id] = {
+        partner:0,
+        partner_answer:answers
+      };
+      console.log("No Match");
+    }
+    else{
+      players[socket.id] = {
+        partner:last_wait,
+        partner_answer:last_ans
+      };
+      players[last_wait.id]={
+        partner:socket,
+        partner_answer:answers,
+      };
+      last_wait.emit('startMatch');
+      socket.emit('startMatch')
+      last_wait=0;
+      last_ans=0;
+      console.log("Match Found");
+    }
+  });
+  socket.on('answers', function(data,cur) {
+      players[players[socket.id].partner.id].partner_answer=data;
+      
+      if(players[socket.id].partner_answer[cur]==data[cur]){
+        socket.emit('ansMatch');
+        players[socket.id].partner.emit('ansMatch');
+      }
+    
+  });
+});

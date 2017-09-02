@@ -11,7 +11,18 @@
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <div style="margin-top: 20px">
+      <tr><td>Score: </td>
+      <td><input type=text size=5 id="score" value=0></td></tr>
+    </div>
+    <img  style="margin-top:20px;margin-left: 33%" id="primary" width="33%" height="33%">
+    <div style="margin-top: 20px">
+      <h3 style="margin-left:40% ">Options are:</h3>
+    </div>
+    <div style="margin-top:20px ">
+      <img  style="margin-left: 20%" id="sec_1" width="20%" height="20%" onclick="option_a_selected()">
+      <a onclick="option_b_selected()"><img  style="margin-left: 20%" id="sec_2" width="20%" height="20%" ></a>
+    </div>
   </body>
   <script src="/static/game.js"></script>
 </html>
