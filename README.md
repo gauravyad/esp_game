@@ -2,7 +2,7 @@
 1. Clone the repository on your system.
 2. You will require nodeJS to run. Hence, install nodeJS by-                            
   brew install npm
-3. You will require to run following npm commands in the directory for dependencies:
+3. You will require to run following npm commands in the directory for dependencies:                                     
   npm init                                                      
   npm install --save express socket.io                                     
   npm install fs                             
