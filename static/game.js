@@ -46,12 +46,10 @@ socket.on('signup_sucessful',function(){
 })
 socket.on('login_sucessful',function(data){
   data=data+'';
-  console.log('logged in')
   for(var i=0;i<15;i++){
     answers[i]=data.charAt(i);
   }
   start();
-  document.getElementById('wait').style='visiblity:show';
   document.getElementById('login').style='display:none';
 })
 socket.on('score', function(data) {
@@ -67,6 +65,8 @@ socket.on('restart',function(){
 
 function start(){
   socket.emit('new player',answers);
+  document.getElementById('wait').style='visiblity:show';
+  document.getElementById('restart').style='display:none';
 }
 function option_b_selected(){
   answers[cur]='B';
