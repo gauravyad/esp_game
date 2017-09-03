@@ -6,7 +6,6 @@ var socketIO = require('socket.io');
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
-var mysql=require('mysql');
 var fs = require('fs');
 var users={};
 var activeusers={};
@@ -55,13 +54,13 @@ io.on('connection', function(socket) {
         var j;
         for(j=0;j<activeusers.length;j++){
           if(activeusers[i].startsWith(data)==true){
-            socket.emit('login unsucessful!')
+            socket.emit('login_unsucessful')
             break;
           }
         }
         if(j==active){
           socket.emit('login_sucessful',users[i].substring(users[i].length-15,users[i].length));
-          console.log('login_sucessful!');
+          //console.log('login_sucessful!');
           //activeusers[active]=users[i];
           //console.log(activeusers);
           //active++;
@@ -70,15 +69,17 @@ io.on('connection', function(socket) {
       }
     }
     if(i==users.length){
-      socket.emit('login unsucessful!');
-      console.log('login unsucessful!');
+      socket.emit('login_unsucessful');
+      //console.log('login unsucessful!');
     }
   })
   socket.on('signup',function(data){
+    data=data+'';
+    var sup=data.split('::');
     for(var i=0;i<users.length;i++){
-      if(users[i].indexOf(data)!=-1){
-        socket.emit('signup unsucessful!');
-        console.log('signup unsucessful!');
+      if(users[i].indexOf(sup[0])!=-1){
+        socket.emit('signup_unsucessful');
+        //console.log('signup unsucessful!');
         break;
         }
       }
@@ -88,11 +89,11 @@ io.on('connection', function(socket) {
     data=data+content;
     fs.writeFile('data.txt',data);
     socket.emit('signup_sucessful');
-    console.log('signup sucessful!');
+    //console.log('signup sucessful!');
   })
   socket.on('new player', function(answers,email) {
     player_num++;
-    console.log(player_num);
+    //console.log(player_num);
     if(player_num%2==1){
       last_wait=socket;
       last_ans=answers;
@@ -102,7 +103,7 @@ io.on('connection', function(socket) {
         partner_answer:answers,
         isPlaying:true
       };
-      console.log("No Match");
+      //console.log("No Match");
     }
     else{
       players[socket.id] = {
@@ -149,7 +150,7 @@ io.on('connection', function(socket) {
       socket.emit('startMatch',imgs)
       last_wait=0;
       last_ans=0;
-      console.log("Match Found");
+      //console.log("Match Found");
       }
     
   });
@@ -159,13 +160,13 @@ io.on('connection', function(socket) {
       content=content+"^^"+users[i];
     }
     if(player_num>0)player_num--;
-    console.log(player_num);
-    console.log(content)
+    //console.log(player_num);
+    //console.log(content)
     fs.writeFile('data.txt',content)
     if(player_num>0){
     players[socket.id].isPlaying=false;
     player_num--;
-    console.log(player_num);
+    //console.log(player_num);
     players[socket.id].partner.emit('restart');
     players[players[socket.id].partner.id].isPlaying=false;
   }
@@ -175,7 +176,7 @@ io.on('connection', function(socket) {
       if(players[players[socket.id].partner.id].isPlaying==false){
         var score=0;
         for(var i=0;i<5;i++){
-          console.log(players[socket.id].partner_answer[arr[i]],data[arr[i]])
+          //console.log(players[socket.id].partner_answer[arr[i]],data[arr[i]])
           if(players[socket.id].partner_answer[arr[i]]==data[arr[i]]){
             score++;
           }
@@ -193,16 +194,16 @@ io.on('connection', function(socket) {
         players[socket.id].partner.emit('score',score);
       }
       var pas='';
-      console.log(data);
+      //console.log(data);
       for(var i=1;i<=15;i++){
         pas=pas+data[i];
       }
-      console.log(pas);
+      //console.log(pas);
       email=email+'';
       for(var i=0;i<users.length;i++){
         if(users[i].startsWith(email)==true){
           users[i]=users[i].substring(0,users[i].length-15)+pas;
-          console.log(users[i]);
+          //console.log(users[i]);
           break;
         }
       }
