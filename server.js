@@ -6,15 +6,24 @@ var socketIO = require('socket.io');
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
-app.set('port', 5000);
+var mysql=require('mysql');
+app.set('port', 0);
 app.use('/static', express.static(__dirname + '/static'));
 // Routing
 app.get('/', function(request, response) {
+  response.sendFile(path.join(__dirname, 'home.html'));
+});
+app.get('/index.html', function(request, response) {
   response.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/restart.html', function(request, response) {
+  response.sendFile(path.join(__dirname, 'restart.html'));
+});
+
+
 // Starts the server.
-server.listen(5000, function() {
-  console.log('Starting server on port 5000');
+server.listen(8080, function() {
+  console.log('Starting server on port 8080');
 });
 // Add the WebSocket handlers
 io.on('connection', function(socket) {
@@ -71,6 +80,12 @@ io.on('connection', function(socket) {
       }
     
   });
+  socket.on('exit',function(){
+    players[socket.id].isPlaying=false;
+    player_num-2;
+    players[socket.id].partner.emit('restart');
+    players[players[socket.id].partner.id].isPlaying=false;
+  })
   socket.on('answers', function(data,arr) {
       players[players[socket.id].partner.id].partner_answer=data;
       if(players[players[socket.id].partner.id].isPlaying==false){
@@ -84,5 +99,6 @@ io.on('connection', function(socket) {
         players[socket.id].partner.emit('score',score);
       }
       players[socket.id].isPlaying=false;
+      player_num--;
   });
 });
