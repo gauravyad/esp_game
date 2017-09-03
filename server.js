@@ -15,6 +15,7 @@ var players = {};
 var player_num=0;
 var last_wait=0;
 var last_ans=0;
+var last_email;
 app.set('port', 0);
 app.use('/static', express.static(__dirname + '/static'));
 // Routing
@@ -89,13 +90,13 @@ io.on('connection', function(socket) {
     socket.emit('signup_sucessful');
     console.log('signup sucessful!');
   })
-  socket.on('new player', function(answers) {
+  socket.on('new player', function(answers,email) {
     player_num++;
     console.log(player_num);
     if(player_num%2==1){
       last_wait=socket;
       last_ans=answers;
-    
+      last_email=email;
       players[socket.id] = {
         partner:0,
         partner_answer:answers,
@@ -107,25 +108,30 @@ io.on('connection', function(socket) {
       players[socket.id] = {
         partner:last_wait,
         partner_answer:last_ans,
+        partner_email:last_email,
         isPlaying:true
       };
       players[last_wait.id]={
         partner:socket,
         partner_answer:answers,
+        partner_email:email,
         isPlaying:true
       };
       var imgs={};
-      var count=5;
-      for(var i=1;i<=15&&count>0;i++){
+      var count=2,k=0;
+      for(var i=1;i<=15&&k<count;i++){
         if(answers[i]=='-'||last_ans[i]=='-')continue;
         if(answers[i]==last_ans[i]){
-          imgs[5-count]=i;
+          imgs[k]=i;
           count--;
+          k++;
         }
       }
+      count=count+3;
       for(var i=0;count>0;i++){
         var cur=Math.floor(Math.random()*15)+1;
-        for(var j=0;j<i;j++){
+        if(cur==16)cur=15;
+        for(var j=0;j<k;j++){
           if(cur==imgs[j]){
             i--;
             cur=-1;
@@ -133,8 +139,9 @@ io.on('connection', function(socket) {
           }
         }
         if(cur!=-1){
-          imgs[5-count]=cur;
+          imgs[k]=cur;
           count--;
+          k++;
         }
       }
 
@@ -151,7 +158,7 @@ io.on('connection', function(socket) {
     for(var i=1;i<users.length;i++){
       content=content+"^^"+users[i];
     }
-    player_num--;
+    if(player_num>0)player_num--;
     console.log(player_num);
     console.log(content)
     fs.writeFile('data.txt',content)
@@ -173,13 +180,22 @@ io.on('connection', function(socket) {
             score++;
           }
         }
+        if(score==5){
+          var count=0;
+          for(var i=1;i<=15;i++){
+            count++;
+          }
+          if(count==15){
+            console.log(email+' and '+players[socket.id].partner_email+' have reached consesus.')
+          }
+        }
         socket.emit('score',score);
         players[socket.id].partner.emit('score',score);
       }
       var pas='';
       console.log(data);
       for(var i=1;i<=15;i++){
-        pas=pas.concat(data[i]);
+        pas=pas+data[i];
       }
       console.log(pas);
       email=email+'';

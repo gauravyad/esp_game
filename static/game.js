@@ -1,5 +1,5 @@
 var socket = io();
-var score=0;
+var score='Waitng for opponent';
 var i=0;
 var arr={};
 var cur;
@@ -15,7 +15,9 @@ function login(){
   curstr=email+'::'+password;
   socket.emit('login',curstr);
 }
-
+function logout(){
+  window.location.href="/";
+}
 function disp_signup(){
   document.getElementById('signup').style='visiblity:show';
   document.getElementById('email_l').value='';
@@ -35,7 +37,10 @@ socket.on('startMatch', function(data) {
     document.getElementById('wait').style='display:none';
     document.getElementById('canvas').style='visiblity:show';
     arr=data;
-    cur=data[i];
+    cur=arr[i];
+    console.log(cur);
+    console.log(data);
+    score='Waiting for opponent!';
     var image=document.getElementById('primary');
     image.src='static/images/'+cur.toString()+'.jpeg';
     var secon_1=document.getElementById('sec_1');
@@ -50,9 +55,11 @@ socket.on('signup_sucessful',function(){
 socket.on('login_sucessful',function(data){
   data=data+'';
   for(var i=1;i<=15;i++){
-    answers[i]=data.charAt(i);
+    answers[i]=data.charAt(i-1);
   }
   start();
+  document.getElementById('logged').style='margin-left: 70%;margin-top: 3%;visiblity:show';
+  document.getElementById('user').value=email;
   document.getElementById('login').style='display:none';
 })
 socket.on('score', function(data) {
@@ -68,20 +75,19 @@ socket.on('restart',function(){
 
 function start(){
   i=0;
-  socket.emit('new player',answers);
-  document.getElementById('wait').style='visiblity:show';
+  score='Waiting for opponent';
+  socket.emit('new player',answers,email);
+  document.getElementById('wait').style='margin-top:20%;margin-left:40%;visiblity:show';
   document.getElementById('restart').style='display:none';
 }
 function option_b_selected(){
   answers[cur]='B';
-  console.log(answers[cur])
-  alert('B selected')
+  document.getElementById('option').value='B';
   
 }
 function option_a_selected(){
   answers[cur]='A';
-  console.log(answers[cur]);
-  alert('A selected');
+  document.getElementById('option').value='A';
 }
 window.onbeforeunload = function (e) {
   var e = e || window.event;
@@ -99,10 +105,12 @@ function on_submit(){
     var secon_2=document.getElementById('sec_2');
     secon_1.src='static/images/'+cur.toString()+'_1.jpeg';
     secon_2.src='static/images/'+cur.toString()+'_2.jpeg';
+    document.getElementById('option').value='';
   }
   else{
     document.getElementById('restart').style='visiblity:show';
     document.getElementById('canvas').style='display:none';
+    document.getElementById('score').value='Waiting for Opponent';
     socket.emit('answers',answers,arr,email)
   }
 }
