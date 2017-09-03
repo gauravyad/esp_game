@@ -67,6 +67,12 @@ socket.on('score', function(data) {
   document.getElementById('canvas').style='display:none';
 
 });
+socket.on('login_unsucessful',function(){
+  alert('Wrong Email or Password!!');
+})
+socket.on('signup_unsucessful',function(){
+  alert('Email Exists!!');
+})
 socket.on('restart',function(){
   document.getElementById('restart').style='visiblity:show';
   document.getElementById('score').value="Your opponent has quit!";
