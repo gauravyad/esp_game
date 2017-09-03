@@ -16,5 +16,5 @@
 Features:
 1. I have ensured all must haves have been checked.
 2. I applied following extra features:                                                  
-    a. The algorithm tries the to assign 2 of five images for which the users have given same answer.
+    a. The algorithm tries the to assign 2 of five images for which the users have given same answer.                    
     b. The algorithm prints a message on server console when 2 users reach consensus on all the question.
