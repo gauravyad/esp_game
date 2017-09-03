@@ -75,14 +75,17 @@ io.on('connection', function(socket) {
   })
   socket.on('signup',function(data){
     data=data+'';
+    var f=0;
     var sup=data.split('::');
     for(var i=0;i<users.length;i++){
       if(users[i].indexOf(sup[0])!=-1){
         socket.emit('signup_unsucessful');
         //console.log('signup unsucessful!');
+        f=1;
         break;
         }
       }
+    if(f==0){
     data=data+'::---------------';
     users.push(data);
     data=data+'^^';
@@ -90,6 +93,7 @@ io.on('connection', function(socket) {
     fs.writeFile('data.txt',data);
     socket.emit('signup_sucessful');
     //console.log('signup sucessful!');
+  }
   })
   socket.on('new player', function(answers,email) {
     player_num++;
