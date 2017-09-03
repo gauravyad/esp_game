@@ -4,7 +4,7 @@
   brew install npm
 3. You will require to run following npm commands in the directory for dependencies:
   npm init                                                      
-  npm install --save express socket.io\n                                     
+  npm install --save express socket.io                                     
   npm install fs                             
 4. After installing all the dependencies use                                    
   node server.js
