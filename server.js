@@ -187,7 +187,7 @@ io.on('connection', function(socket) {
             count++;
           }
           if(count==15){
-            console.log(email+' and '+players[socket.id].partner_email+' have reached consesus.')
+            console.log(email+' and '+players[socket.id].partner_email+' have reached consens.')
           }
         }
         socket.emit('score',score);
