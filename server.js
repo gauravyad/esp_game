@@ -11,6 +11,10 @@ var fs = require('fs');
 var users={};
 var activeusers={};
 var active=0;
+var players = {};
+var player_num=0;
+var last_wait=0;
+var last_ans=0;
 app.set('port', 0);
 app.use('/static', express.static(__dirname + '/static'));
 // Routing
@@ -19,12 +23,6 @@ app.get('/', function(request, response) {
 });
 app.get('/index.html', function(request, response) {
   response.sendFile(path.join(__dirname, 'index.html'));
-});
-app.get('/signup.html', function(request, response) {
-  response.sendFile(path.join(__dirname, 'signup.html'));
-});
-app.get('/login.html', function(request, response) {
-  response.sendFile(path.join(__dirname, 'login.html'));
 });
 var content;
 // First I want to read the file
@@ -47,10 +45,7 @@ server.listen(8080, function() {
 // Add the WebSocket handlers
 io.on('connection', function(socket) {
 });
-var players = {};
-var player_num=0;
-var last_wait=0;
-var last_ans=0;
+
 io.on('connection', function(socket) {
   socket.on('login',function(data){
     data=data+'';
@@ -66,7 +61,9 @@ io.on('connection', function(socket) {
         if(j==active){
           socket.emit('login_sucessful',users[i].substring(users[i].length-15,users[i].length));
           console.log('login_sucessful!');
-          //activeusers.push(users[i]);
+          //activeusers[active]=users[i];
+          //console.log(activeusers);
+          //active++;
           break;
         }
       }
@@ -94,6 +91,7 @@ io.on('connection', function(socket) {
   })
   socket.on('new player', function(answers) {
     player_num++;
+    console.log(player_num);
     if(player_num%2==1){
       last_wait=socket;
       last_ans=answers;
@@ -117,7 +115,15 @@ io.on('connection', function(socket) {
         isPlaying:true
       };
       var imgs={};
-      for(var i=0;i<5;i++){
+      var count=5;
+      for(var i=1;i<=15&&count>0;i++){
+        if(answers[i]=='-'||last_ans[i]=='-')continue;
+        if(answers[i]==last_ans[i]){
+          imgs[5-count]=i;
+          count--;
+        }
+      }
+      for(var i=0;count>0;i++){
         var cur=Math.floor(Math.random()*15)+1;
         for(var j=0;j<i;j++){
           if(cur==imgs[j]){
@@ -127,7 +133,8 @@ io.on('connection', function(socket) {
           }
         }
         if(cur!=-1){
-          imgs[i]=cur;
+          imgs[5-count]=cur;
+          count--;
         }
       }
 
@@ -144,11 +151,14 @@ io.on('connection', function(socket) {
     for(var i=1;i<users.length;i++){
       content=content+"^^"+users[i];
     }
+    player_num--;
+    console.log(player_num);
     console.log(content)
     fs.writeFile('data.txt',content)
-    if(player_num>1){
+    if(player_num>0){
     players[socket.id].isPlaying=false;
-    player_num-2;
+    player_num--;
+    console.log(player_num);
     players[socket.id].partner.emit('restart');
     players[players[socket.id].partner.id].isPlaying=false;
   }

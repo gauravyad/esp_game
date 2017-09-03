@@ -4,7 +4,7 @@ var i=0;
 var arr={};
 var cur;
 var curstr;
-var email;
+var email='';
 var password;
 var answers = {
   one: '-'
@@ -18,6 +18,9 @@ function login(){
 
 function disp_signup(){
   document.getElementById('signup').style='visiblity:show';
+  document.getElementById('email_l').value='';
+  document.getElementById('password_l').value='';
+  document.getElementById('name').value='';
   document.getElementById('login').style='display:none';
 }
 function signup(){
@@ -46,7 +49,7 @@ socket.on('signup_sucessful',function(){
 })
 socket.on('login_sucessful',function(data){
   data=data+'';
-  for(var i=0;i<15;i++){
+  for(var i=1;i<=15;i++){
     answers[i]=data.charAt(i);
   }
   start();
@@ -64,6 +67,7 @@ socket.on('restart',function(){
 })
 
 function start(){
+  i=0;
   socket.emit('new player',answers);
   document.getElementById('wait').style='visiblity:show';
   document.getElementById('restart').style='display:none';
@@ -81,8 +85,9 @@ function option_a_selected(){
 }
 window.onbeforeunload = function (e) {
   var e = e || window.event;
-
+  if (email!='') {
   socket.emit('exit')
+}
 };
 function on_submit(){
   i++;
