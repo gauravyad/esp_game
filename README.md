@@ -3,10 +3,10 @@
 2. You will require nodeJS to run. Hence, install nodeJS by-
   brew install npm
 3. You will require to run following npm commands in the directory for dependencies:
-  npm init\n
-  npm install --save express socket.io\n
-  npm install fs
-4. After installing all the dependencies use
+  npm init                                                      
+  npm install --save express socket.io\n                                     
+  npm install fs                             
+4. After installing all the dependencies use                                    
   node server.js
   to start the server at localhost:8080.
 5. Use web browser to access localhost:8080 and use signup to create users.
